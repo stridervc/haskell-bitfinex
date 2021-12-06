@@ -27,6 +27,10 @@ library:
   dependencies:
   - aeson
   - http-conduit
+  - bytestring
+  - time
+  - SHA
+  - utf8-string
 
 tests:
   haskell-bitfinex-test:
