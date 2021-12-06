@@ -1,6 +1,7 @@
 module Bitfinex
   ( BitfinexClient (..)
   , newBitfinexClient
+  , Ticker (..)
   , ticker
   ) where
 
