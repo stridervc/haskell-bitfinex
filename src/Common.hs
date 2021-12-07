@@ -56,10 +56,6 @@ instance ToJSON AffiliateJSON
 
 queryBitfinexAuthenticated :: (FromJSON a) => BitfinexClient -> String -> IO a
 queryBitfinexAuthenticated client endpoint = do
-  {-
-  now <- getPOSIXTime
-  let nonce = show now
-  -}
   now <- getCurrentTime
   let nonce = show $ floor $ 1e9 * nominalDiffTimeToSeconds (utcTimeToPOSIXSeconds now)
   let apipath = "/v2/auth/" <> endpoint
@@ -71,7 +67,7 @@ queryBitfinexAuthenticated client endpoint = do
               $ setRequestHeader "bfx-nonce" [ pack nonce ]
               $ setRequestHeader "bfx-apikey" [ apikey ]
               $ setRequestHeader "bfx-signature" [ pack signed ]
-              $ setRequestBodyJSON (AffiliateJSON $ AffCode affiliate)
+              -- setRequestBodyJSON (AffiliateJSON $ AffCode affiliate)
                 request'
 
   return <$> getResponseBody =<< httpJSON request
