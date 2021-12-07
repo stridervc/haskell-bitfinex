@@ -10,6 +10,7 @@ module Common
   , queryBitfinexAuthenticated
   ) where
 
+import Data.Time
 import Data.Aeson
 import Network.HTTP.Simple
 import Data.Maybe (fromJust)
@@ -17,7 +18,7 @@ import Data.ByteString (ByteString)
 import Data.ByteString.Char8 (pack)
 import Data.ByteString.Lazy (fromStrict)
 import Data.Digest.Pure.SHA (hmacSha384)
-import Data.Time.Clock.POSIX (getPOSIXTime)
+import Data.Time.Clock.POSIX (getPOSIXTime, utcTimeToPOSIXSeconds)
 import Data.ByteString.Lazy.UTF8 (fromString)
 
 type Price      = Float
@@ -48,8 +49,12 @@ queryBitfinexPublic client endpoint = do
 
 queryBitfinexAuthenticated :: (FromJSON a) => BitfinexClient -> String -> IO a
 queryBitfinexAuthenticated client endpoint = do
+  {-
   now <- getPOSIXTime
   let nonce = show now
+  -}
+  now <- getCurrentTime
+  let nonce = show $ floor $ 1e9 * nominalDiffTimeToSeconds (utcTimeToPOSIXSeconds now)
   let apipath = "/v2/auth/" <> endpoint
   let signature = "/api/" <> apipath <> nonce
   let signed = show $ hmacSha384 (fromStrict apisecret) (fromString signature)
