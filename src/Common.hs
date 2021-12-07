@@ -57,8 +57,7 @@ instance ToJSON AffiliateJSON
 queryBitfinexAuthenticated :: (FromJSON a) => BitfinexClient -> String -> IO a
 queryBitfinexAuthenticated client endpoint = do
   now <- getCurrentTime
-  let nonce     = show $ floor $ 1e9 * nominalDiffTimeToSeconds (utcTimeToPOSIXSeconds now)
-  let nonce     = "11"
+  let nonce     = show $ floor $ 1e6 * nominalDiffTimeToSeconds (utcTimeToPOSIXSeconds now)
   let apipath   = "/v2/auth/" <> endpoint
   let signature = "/api" <> apipath <> nonce
   let signed    = show $ hmacSha384 (fromStrict apisecret) (fromString signature)
