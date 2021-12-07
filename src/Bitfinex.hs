@@ -6,6 +6,7 @@ module Bitfinex
   , ticker
   , MarginInfo (..)
   , marginInfo
+  , Position (..)
   , positions
   ) where
 
