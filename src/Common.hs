@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Common
@@ -10,6 +11,7 @@ module Common
   , queryBitfinexAuthenticated
   ) where
 
+import GHC.Generics
 import Data.Time
 import Data.Aeson
 import Network.HTTP.Simple
@@ -47,6 +49,11 @@ queryBitfinexPublic client endpoint = do
   url <- parseRequest $ _publicBaseUrl client <> endpoint
   return <$> getResponseBody =<< httpJSON url
 
+newtype AffCode = AffCode { aff_code :: String } deriving (Generic)
+instance ToJSON AffCode
+newtype AffiliateJSON = AffiliateJSON { meta :: AffCode } deriving (Generic)
+instance ToJSON AffiliateJSON
+
 queryBitfinexAuthenticated :: (FromJSON a) => BitfinexClient -> String -> IO a
 queryBitfinexAuthenticated client endpoint = do
   {-
@@ -64,8 +71,10 @@ queryBitfinexAuthenticated client endpoint = do
               $ setRequestHeader "bfx-nonce" [ pack nonce ]
               $ setRequestHeader "bfx-apikey" [ apikey ]
               $ setRequestHeader "bfx-signature" [ pack signed ]
+              $ setRequestBodyJSON (AffiliateJSON $ AffCode affiliate)
                 request'
 
   return <$> getResponseBody =<< httpJSON request
   where apikey    = fromJust $ _key client
         apisecret = fromJust $ _secret client
+        affiliate = show $ fromJust $ _affiliate client
