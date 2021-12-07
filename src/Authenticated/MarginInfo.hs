@@ -9,9 +9,17 @@ import Common
 import Data.Aeson
 import GHC.Generics
 
-newtype MarginInfo = MarginInfo ([String], [Float]) deriving (Eq, Show, Generic)
+newtype MarginInfoRaw = MarginInfoRaw (String, String, [Float]) deriving (Eq, Show, Generic)
+instance FromJSON MarginInfoRaw
 
-instance FromJSON MarginInfo
+data MarginInfo = MarginInfo
+  { marginType      :: String
+  , marginSymbol    :: String
+  , marginTradable  :: Float
+  , marginGross     :: Float
+  , marginBuy       :: Float
+  , marginSell      :: Float
+  } deriving (Eq, Show)
 
-marginInfo :: BitfinexClient -> IO MarginInfo
+marginInfo :: BitfinexClient -> IO MarginInfoRaw
 marginInfo client = queryBitfinexAuthenticated client "r/info/margin/tBTCUSD"
