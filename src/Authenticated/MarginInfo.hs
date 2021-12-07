@@ -18,4 +18,4 @@ data MarginInfo = MarginInfo
 instance FromJSON MarginInfo
 
 marginInfo :: BitfinexClient -> IO MarginInfo
-marginInfo client = queryBitfinexAuthenticated client "/r/info/margin/tBTCUSD"
+marginInfo client = queryBitfinexAuthenticated client "r/info/margin/tBTCUSD"
