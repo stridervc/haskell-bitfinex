@@ -21,5 +21,6 @@ data MarginInfo = MarginInfo
   , marginSell      :: Float
   } deriving (Eq, Show)
 
-marginInfo :: BitfinexClient -> IO MarginInfoRaw
-marginInfo client = queryBitfinexAuthenticated client "r/info/margin/tBTCUSD"
+marginInfo :: BitfinexClient -> IO MarginInfo
+marginInfo client = fromRaw <$> queryBitfinexAuthenticated client "r/info/margin/tBTCUSD"
+  where fromRaw (MarginInfoRaw (s1,s2,fs))  = MarginInfo s1 s2 (head fs) (fs!!1) (fs!!2) (fs!!3)
