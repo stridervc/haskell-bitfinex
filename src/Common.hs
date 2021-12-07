@@ -7,6 +7,7 @@ module Common
   , newBitfinexClient
   , newAuthenticatedBitfinexClient
   , queryBitfinexPublic
+  , queryBitfinexAuthenticated
   ) where
 
 import Data.Aeson
