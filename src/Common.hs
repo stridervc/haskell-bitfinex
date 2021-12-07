@@ -66,7 +66,7 @@ queryBitfinexAuthenticated client endpoint = do
   let signature = "/api/" <> apipath <> nonce
   let signed = show $ hmacSha384 (fromStrict apisecret) (fromString signature)
 
-  request' <- parseRequest $ _authenticatedBaseUrl client <> apipath
+  request' <- parseRequest $ "POST " <> _authenticatedBaseUrl client <> apipath
   let request = setRequestHeader "Content-Type" [ "application/json" ]
               $ setRequestHeader "bfx-nonce" [ pack nonce ]
               $ setRequestHeader "bfx-apikey" [ apikey ]
