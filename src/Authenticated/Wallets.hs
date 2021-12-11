@@ -18,7 +18,7 @@ data Wallet = Wallet
   , walletBalance           :: Float
   , walletUnsettledInterest :: Float
   , walletAvailableBalance  :: Float
-  , walletLastChange        :: Float
+  , walletLastChange        :: String
   } deriving (Eq, Show)
 
 fromRaw :: WalletRaw -> Wallet
