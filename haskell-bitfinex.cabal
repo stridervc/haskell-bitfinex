@@ -27,6 +27,7 @@ library
   exposed-modules:
       Authenticated.MarginInfo
       Authenticated.RetrievePositions
+      Authenticated.Wallets
       Bitfinex
       Common
       Public.Ticker

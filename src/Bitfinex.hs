@@ -8,9 +8,12 @@ module Bitfinex
   , marginInfo
   , Position (..)
   , positions
+  , Wallet (..)
+  , wallets
   ) where
 
 import Common
 import Public.Ticker
+import Authenticated.Wallets
 import Authenticated.MarginInfo
 import Authenticated.RetrievePositions
