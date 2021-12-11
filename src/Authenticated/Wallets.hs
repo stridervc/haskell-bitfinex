@@ -18,11 +18,10 @@ data Wallet = Wallet
   , walletBalance           :: Float
   , walletUnsettledInterest :: Float
   , walletAvailableBalance  :: Float
-  , walletLastChange        :: String
   } deriving (Eq, Show)
 
 fromRaw :: WalletRaw -> Wallet
-fromRaw (WalletRaw v) = Wallet wtype curr bal ui ab lc
+fromRaw (WalletRaw v) = Wallet wtype curr bal ui ab
   where decode' a = case fromJSON a of
                       Success a -> a
                       Error e   -> error e
@@ -31,7 +30,6 @@ fromRaw (WalletRaw v) = Wallet wtype curr bal ui ab lc
         bal       = decode' $ v!!2
         ui        = decode' $ v!!3
         ab        = decode' $ v!!4
-        lc        = decode' $ v!!5
 
 wallets :: BitfinexClient -> IO [Wallet]
 wallets client = map fromRaw <$> queryBitfinexAuthenticated client "r/wallets"
