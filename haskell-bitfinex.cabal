@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       Authenticated.MarginInfo
+      Authenticated.RetrieveOrders
       Authenticated.RetrievePositions
       Authenticated.Wallets
       Bitfinex

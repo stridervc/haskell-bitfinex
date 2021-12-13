@@ -10,10 +10,13 @@ module Bitfinex
   , positions
   , Wallet (..)
   , wallets
+  , Order (..)
+  , retrieveOrders
   ) where
 
 import Common
 import Public.Ticker
 import Authenticated.Wallets
 import Authenticated.MarginInfo
+import Authenticated.RetrieveOrders
 import Authenticated.RetrievePositions
