@@ -16,7 +16,7 @@ instance FromJSON OrderRaw
 
 data Order = Order
   { orderID             :: Int
-  , orderGID            :: Int
+  , orderGID            :: Maybe Int
   , orderCID            :: Int
   , orderSymbol         :: String
   , orderCreateTime     :: UTCTime
