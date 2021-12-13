@@ -56,7 +56,7 @@ fromRaw (OrderRaw v) = Order oid ogid ocid sym ct ut amt amto typ flgs stat pric
         avgp      = decode' $ v!!17
         tp        = decode' $ v!!18
         alp       = decode' $ v!!19
-        hid       = decode' $ v!!23
+        hid       = (decode' $ v!!23 :: Int) == 1
         pid       = decode' $ v!!24
         rout      = decode' $ v!!28
 
