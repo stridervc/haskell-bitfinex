@@ -55,12 +55,12 @@ instance ToJSON AffCode
 newtype AffiliateJSON = AffiliateJSON { meta :: AffCode } deriving (Generic)
 instance ToJSON AffiliateJSON
 
-queryBitfinexAuthenticatedWithBody :: (FromJSON a, ToJSON b) => BitfinexClient -> b -> String -> IO a
+queryBitfinexAuthenticatedWithBody :: (FromJSON a, ToJSON b, Show b) => BitfinexClient -> b -> String -> IO a
 queryBitfinexAuthenticatedWithBody client body endpoint = do
   now <- getCurrentTime
   let nonce     = show $ floor $ 1e6 * nominalDiffTimeToSeconds (utcTimeToPOSIXSeconds now)
   let apipath   = "/v2/auth/" <> endpoint
-  let signature = "/api" <> apipath <> nonce
+  let signature = "/api" <> apipath <> nonce <> show body
   let signed    = show $ hmacSha384 (fromStrict apisecret) (fromString signature)
 
   request' <- parseRequest $ "POST " <> _authenticatedBaseUrl client <> apipath
