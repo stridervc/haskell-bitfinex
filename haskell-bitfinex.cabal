@@ -25,6 +25,7 @@ source-repository head
 
 library
   exposed-modules:
+      Authenticated.CancelOrder
       Authenticated.MarginInfo
       Authenticated.RetrieveOrders
       Authenticated.RetrievePositions

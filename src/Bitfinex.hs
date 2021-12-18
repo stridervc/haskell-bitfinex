@@ -12,11 +12,13 @@ module Bitfinex
   , wallets
   , Order (..)
   , retrieveOrders
+  , cancelOrder
   ) where
 
 import Common
 import Public.Ticker
 import Authenticated.Wallets
 import Authenticated.MarginInfo
+import Authenticated.CancelOrder
 import Authenticated.RetrieveOrders
 import Authenticated.RetrievePositions

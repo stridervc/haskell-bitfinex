@@ -8,6 +8,7 @@ module Common
   , newBitfinexClient
   , newAuthenticatedBitfinexClient
   , queryBitfinexPublic
+  , queryBitfinexAuthenticatedWithBody
   , queryBitfinexAuthenticated
   ) where
 
@@ -54,8 +55,8 @@ instance ToJSON AffCode
 newtype AffiliateJSON = AffiliateJSON { meta :: AffCode } deriving (Generic)
 instance ToJSON AffiliateJSON
 
-queryBitfinexAuthenticated :: (FromJSON a) => BitfinexClient -> String -> IO a
-queryBitfinexAuthenticated client endpoint = do
+queryBitfinexAuthenticatedWithBody :: (FromJSON a, ToJSON b) => BitfinexClient -> b -> String -> IO a
+queryBitfinexAuthenticatedWithBody client body endpoint = do
   now <- getCurrentTime
   let nonce     = show $ floor $ 1e6 * nominalDiffTimeToSeconds (utcTimeToPOSIXSeconds now)
   let apipath   = "/v2/auth/" <> endpoint
@@ -67,7 +68,7 @@ queryBitfinexAuthenticated client endpoint = do
               $ setRequestHeader "bfx-nonce" [ pack nonce ]
               $ setRequestHeader "bfx-apikey" [ apikey ]
               $ setRequestHeader "bfx-signature" [ pack signed ]
-              $ setRequestBody ""
+              $ setRequestBodyJSON body
               -- setRequestBodyJSON (AffiliateJSON $ AffCode affiliate)
                 request'
 
@@ -75,3 +76,6 @@ queryBitfinexAuthenticated client endpoint = do
   where apikey    = fromJust $ _key client
         apisecret = fromJust $ _secret client
         affiliate = show $ fromJust $ _affiliate client
+
+queryBitfinexAuthenticated :: (FromJSON a) => BitfinexClient -> String -> IO a
+queryBitfinexAuthenticated client = queryBitfinexAuthenticatedWithBody client ("" :: String)
