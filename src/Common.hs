@@ -63,8 +63,8 @@ stringify []      = ""
 stringify params  = "{" <> keyvalues <> "}"
   where keyvalues = intercalate "," $ map (\(k,v) -> "\"" <> k <> "\":" <> encode' v) params
         encode' (ParamString s) = encode s
-        encode' (ParamFloat f)  = encode f
-        encode' (ParamInt i)    = encode i
+        encode' (ParamFloat f)  = encode $ show f
+        encode' (ParamInt i)    = encode $ show i
         encode' (ParamRaw r)    = r
 
 queryBitfinexAuthenticatedWithBody :: FromJSON a => BitfinexClient -> Params -> String -> IO a
