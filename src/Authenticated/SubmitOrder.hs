@@ -25,6 +25,6 @@ submitOrder client ordertype symbol amount price = queryBitfinexAuthenticatedWit
   , ("price",   show price)
   , ("amount",  show amount)
   , ("flags",   show 4096) -- post only
-  -- , ("meta",    "{\"aff_code\":\"" <> unpack aff_code <> "\"}")
+  , ("meta",    "{\"aff_code\":\"" <> unpack aff_code <> "\"}")
   ] "w/order/submit"
   where Just aff_code = _affiliate client
