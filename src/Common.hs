@@ -93,10 +93,11 @@ queryBitfinexAuthenticatedWithBody client params endpoint = do
                   -}
 
   return <$> getResponseBody =<< httpJSON request
-  where apikey    = fromJust $ _key client
-        apisecret = fromJust $ _secret client
-        affiliate = show $ fromJust $ _affiliate client
-        unpack'   = tail . init . unpack
+  where apikey      = fromJust $ _key client
+        apisecret   = fromJust $ _secret client
+        affiliate   = show $ fromJust $ _affiliate client
+        unpack' ""  = ""
+        unpack' bs  = tail $ init $ unpack bs
 
 queryBitfinexAuthenticated :: (FromJSON a) => BitfinexClient -> String -> IO a
 queryBitfinexAuthenticated client = queryBitfinexAuthenticatedWithBody client ([] :: [(ByteString,Int)])
