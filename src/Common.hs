@@ -73,8 +73,8 @@ queryBitfinexAuthenticatedWithBody client body endpoint = do
               $ setRequestHeader "bfx-nonce" [ pack nonce ]
               $ setRequestHeader "bfx-apikey" [ apikey ]
               $ setRequestHeader "bfx-signature" [ pack signed ]
-              -- setRequestBody ""
-              $ setRequestBodyJSON body
+              $ setRequestBodyLBS (encode body)
+              -- setRequestBodyJSON body
               -- setRequestBodyJSON (AffiliateJSON $ AffCode affiliate)
                 request'
 
