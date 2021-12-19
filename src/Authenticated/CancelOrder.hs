@@ -13,4 +13,4 @@ newtype CancelOrderResponseRaw = CancelOrderResponseRaw [Value] deriving (Eq, Sh
 instance FromJSON CancelOrderResponseRaw
 
 cancelOrder :: BitfinexClient -> Int -> IO CancelOrderResponseRaw
-cancelOrder client orderID = queryBitfinexAuthenticatedWithBody client [("id", orderID)] "w/order/cancel"
+cancelOrder client orderID = queryBitfinexAuthenticatedWithBody client [("id", ParamInt orderID)] "w/order/cancel"

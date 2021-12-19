@@ -10,6 +10,7 @@ module Common
   , queryBitfinexPublic
   , queryBitfinexAuthenticatedWithBody
   , queryBitfinexAuthenticated
+  , ParamType (..)
   , stringify
   ) where
 
@@ -18,12 +19,12 @@ import Data.Aeson
 import GHC.Generics
 import Network.HTTP.Simple
 import Data.Maybe (fromJust)
-import Data.ByteString.Char8 (pack)
 import Data.Digest.Pure.SHA (hmacSha384)
 import Data.ByteString.Lazy.UTF8 (fromString)
 import Data.ByteString.Lazy (ByteString, toStrict)
-import Data.ByteString.Lazy.Char8 (unpack, intercalate)
+import Data.ByteString.Lazy.Char8 (pack, unpack, intercalate)
 import Data.Time.Clock.POSIX (getPOSIXTime, utcTimeToPOSIXSeconds)
+import qualified Data.ByteString.Char8 as C8
 
 type Price      = Float
 type Percentage = Float
@@ -35,6 +36,9 @@ data BitfinexClient = BitfinexClient
   , _secret               :: Maybe ByteString
   , _affiliate            :: Maybe ByteString
   }
+
+data ParamType = ParamString String | ParamFloat Float | ParamInt Int | ParamRaw ByteString deriving (Eq, Show)
+type Params = [(ByteString, ParamType)]
 
 newBitfinexClient :: BitfinexClient
 newBitfinexClient = BitfinexClient "https://api-pub.bitfinex.com/v2/" "https://api.bitfinex.com" Nothing Nothing Nothing
@@ -51,20 +55,19 @@ queryBitfinexPublic client endpoint = do
   url <- parseRequest $ _publicBaseUrl client <> endpoint
   return <$> getResponseBody =<< httpJSON url
 
-newtype AffCode = AffCode { aff_code :: String } deriving (Generic)
-instance ToJSON AffCode
-newtype AffiliateJSON = AffiliateJSON { meta :: AffCode } deriving (Generic)
-instance ToJSON AffiliateJSON
-
 -- the Bitfinex API doesn't like Aeson's ToJSON value when there's only one
 -- it expects a structure with a single key : value
 -- this function hopes to behave more like java's JSON.stringify
-stringify :: ToJSON a => [(ByteString,a)] -> ByteString
+stringify :: Params -> ByteString
 stringify []      = ""
 stringify params  = "{" <> keyvalues <> "}"
-  where keyvalues = intercalate "," $ map (\(k,v) -> "\"" <> k <> "\":" <> encode v) params
+  where keyvalues = intercalate "," $ map (\(k,v) -> "\"" <> k <> "\":" <> encode' v) params
+        encode' (ParamString s) = encode s
+        encode' (ParamFloat f)  = encode f
+        encode' (ParamInt i)    = encode i
+        encode' (ParamRaw r)    = r
 
-queryBitfinexAuthenticatedWithBody :: (FromJSON a, ToJSON b) => BitfinexClient -> [(ByteString,b)] -> String -> IO a
+queryBitfinexAuthenticatedWithBody :: FromJSON a => BitfinexClient -> Params -> String -> IO a
 queryBitfinexAuthenticatedWithBody client params endpoint = do
   now <- getCurrentTime
   let nonce     = show $ floor $ 1e6 * nominalDiffTimeToSeconds (utcTimeToPOSIXSeconds now)
@@ -77,9 +80,9 @@ queryBitfinexAuthenticatedWithBody client params endpoint = do
 
   request' <- parseRequest $ "POST " <> _authenticatedBaseUrl client <> apipath
   let request = setRequestHeader "Content-Type" [ "application/json" ]
-              $ setRequestHeader "bfx-nonce" [ pack nonce ]
+              $ setRequestHeader "bfx-nonce" [ C8.pack nonce ]
               $ setRequestHeader "bfx-apikey" [ toStrict apikey ]
-              $ setRequestHeader "bfx-signature" [ pack signed ]
+              $ setRequestHeader "bfx-signature" [ C8.pack signed ]
               $ setRequestBodyLBS (stringify params)
                 request'
 
@@ -89,4 +92,4 @@ queryBitfinexAuthenticatedWithBody client params endpoint = do
         affiliate   = show $ fromJust $ _affiliate client
 
 queryBitfinexAuthenticated :: (FromJSON a) => BitfinexClient -> String -> IO a
-queryBitfinexAuthenticated client = queryBitfinexAuthenticatedWithBody client ([] :: [(ByteString,Int)])
+queryBitfinexAuthenticated client = queryBitfinexAuthenticatedWithBody client []

@@ -20,11 +20,12 @@ type Amount     = Float
 
 submitOrder :: BitfinexClient -> OrderType -> Symbol -> Amount -> Price -> IO ResponseRaw
 submitOrder client ordertype symbol amount price = queryBitfinexAuthenticatedWithBody client
-  [ ("type",    ordertype)
-  , ("symbol",  symbol)
-  , ("price",   show price)
-  , ("amount",  show amount)
-  , ("flags",   show 4096) -- post only
-  , ("meta",    unpack (stringify [("aff_code", unpack aff_code)]))
+  [ ("type",    ParamString ordertype)
+  , ("symbol",  ParamString symbol)
+  , ("price",   ParamFloat price)
+  , ("amount",  ParamFloat amount)
+  , ("flags",   ParamInt 4096) -- post only
+  , ("meta",    ParamRaw meta)
   ] "w/order/submit"
   where Just aff_code = _affiliate client
+        meta          = "{\"aff_code\":\"" <> aff_code <> "\"}"
