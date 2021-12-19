@@ -21,8 +21,9 @@ import Data.ByteString (ByteString)
 import Data.ByteString.Char8 (pack)
 import Data.ByteString.Lazy (fromStrict)
 import Data.Digest.Pure.SHA (hmacSha384)
+import Data.ByteString.Lazy.Char8 (unpack)
 import Data.Time.Clock.POSIX (getPOSIXTime, utcTimeToPOSIXSeconds)
-import Data.ByteString.Lazy.UTF8 (fromString, toString)
+import Data.ByteString.Lazy.UTF8 (fromString)
 
 type Price      = Float
 type Percentage = Float
@@ -60,11 +61,11 @@ queryBitfinexAuthenticatedWithBody client body endpoint = do
   now <- getCurrentTime
   let nonce     = show $ floor $ 1e6 * nominalDiffTimeToSeconds (utcTimeToPOSIXSeconds now)
   let apipath   = "/v2/auth/" <> endpoint
-  let signature = "/api" <> apipath <> nonce <> toString (encode body)
+  let signature = "/api" <> apipath <> nonce <> unpack (encode body)
   let signed    = show $ hmacSha384 (fromStrict apisecret) (fromString signature)
 
-  putStrLn $ "DBG: body       =" <> toString (encode body)
-  putStrLn $ "DBG: signature  =" <> signature
+  putStrLn $ "DBG: body       = " <> unpack (encode body)
+  putStrLn $ "DBG: signature  = " <> signature
 
   request' <- parseRequest $ "POST " <> _authenticatedBaseUrl client <> apipath
   let request = setRequestHeader "Content-Type" [ "application/json" ]
