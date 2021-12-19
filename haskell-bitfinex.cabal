@@ -29,6 +29,7 @@ library
       Authenticated.MarginInfo
       Authenticated.RetrieveOrders
       Authenticated.RetrievePositions
+      Authenticated.SubmitOrder
       Authenticated.Wallets
       Bitfinex
       Common
