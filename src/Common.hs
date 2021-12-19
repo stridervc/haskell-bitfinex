@@ -66,6 +66,7 @@ queryBitfinexAuthenticatedWithBody client body endpoint = do
 
   putStrLn $ "DBG: body       = " <> unpack (encode body)
   putStrLn $ "DBG: signature  = " <> signature
+  putStrLn ""
 
   request' <- parseRequest $ "POST " <> _authenticatedBaseUrl client <> apipath
   let request = setRequestHeader "Content-Type" [ "application/json" ]
@@ -83,4 +84,4 @@ queryBitfinexAuthenticatedWithBody client body endpoint = do
         affiliate = show $ fromJust $ _affiliate client
 
 queryBitfinexAuthenticated :: (FromJSON a) => BitfinexClient -> String -> IO a
-queryBitfinexAuthenticated client = queryBitfinexAuthenticatedWithBody client ("" :: String)
+queryBitfinexAuthenticated client = queryBitfinexAuthenticatedWithBody client (mempty :: String)
