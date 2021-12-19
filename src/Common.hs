@@ -12,17 +12,17 @@ module Common
   , queryBitfinexAuthenticated
   ) where
 
-import GHC.Generics
 import Data.Time
 import Data.Aeson
+import GHC.Generics
 import Network.HTTP.Simple
 import Data.Maybe (fromJust)
 import Data.ByteString.Char8 (pack)
-import Data.ByteString.Lazy (ByteString, fromStrict, toStrict)
 import Data.Digest.Pure.SHA (hmacSha384)
+import Data.ByteString.Lazy.UTF8 (fromString)
+import Data.ByteString.Lazy (ByteString, toStrict)
 import Data.ByteString.Lazy.Char8 (unpack, intercalate)
 import Data.Time.Clock.POSIX (getPOSIXTime, utcTimeToPOSIXSeconds)
-import Data.ByteString.Lazy.UTF8 (fromString)
 
 type Price      = Float
 type Percentage = Float
@@ -71,33 +71,18 @@ queryBitfinexAuthenticatedWithBody client params endpoint = do
   let signature = "/api" <> apipath <> nonce <> unpack (stringify params)
   let signed    = show $ hmacSha384 apisecret (fromString signature)
 
-  putStrLn $ "DBG: body       = " <> unpack (stringify params)
-  putStrLn $ "DBG: signature  = " <> signature
-  putStrLn ""
-
   request' <- parseRequest $ "POST " <> _authenticatedBaseUrl client <> apipath
-  let request'' = setRequestHeader "Content-Type" [ "application/json" ]
-                $ setRequestHeader "bfx-nonce" [ pack nonce ]
-                $ setRequestHeader "bfx-apikey" [ toStrict apikey ]
-                $ setRequestHeader "bfx-signature" [ pack signed ]
-                $ setRequestBodyLBS (stringify params)
-                -- setRequestBodyJSON body
-                -- setRequestBodyJSON (AffiliateJSON $ AffCode affiliate)
-                  request'
-
-  let request = request''
-  {-
-  let request = case unpack' $ encode body of
-                  "" -> request''
-                  b  -> setRequestBodyJSON b request''
-                  -}
+  let request = setRequestHeader "Content-Type" [ "application/json" ]
+              $ setRequestHeader "bfx-nonce" [ pack nonce ]
+              $ setRequestHeader "bfx-apikey" [ toStrict apikey ]
+              $ setRequestHeader "bfx-signature" [ pack signed ]
+              $ setRequestBodyLBS (stringify params)
+                request'
 
   return <$> getResponseBody =<< httpJSON request
   where apikey      = fromJust $ _key client
         apisecret   = fromJust $ _secret client
         affiliate   = show $ fromJust $ _affiliate client
-        unpack' ""  = ""
-        unpack' bs  = tail $ init $ unpack bs
 
 queryBitfinexAuthenticated :: (FromJSON a) => BitfinexClient -> String -> IO a
 queryBitfinexAuthenticated client = queryBitfinexAuthenticatedWithBody client ([] :: [(ByteString,Int)])
