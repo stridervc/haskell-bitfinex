@@ -61,10 +61,10 @@ queryBitfinexAuthenticatedWithBody client body endpoint = do
   now <- getCurrentTime
   let nonce     = show $ floor $ 1e6 * nominalDiffTimeToSeconds (utcTimeToPOSIXSeconds now)
   let apipath   = "/v2/auth/" <> endpoint
-  let signature = "/api" <> apipath <> nonce <> unpack (encode body)
+  let signature = "/api" <> apipath <> nonce <> show (encode body)
   let signed    = show $ hmacSha384 (fromStrict apisecret) (fromString signature)
 
-  putStrLn $ "DBG: body       = " <> unpack (encode body)
+  putStrLn $ "DBG: body       = " <> show (encode body)
   putStrLn $ "DBG: signature  = " <> signature
   putStrLn ""
 
