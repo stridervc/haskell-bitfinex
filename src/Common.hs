@@ -63,12 +63,14 @@ queryBitfinexAuthenticatedWithBody client body endpoint = do
   let signature = "/api" <> apipath <> nonce <> toString (encode body)
   let signed    = show $ hmacSha384 (fromStrict apisecret) (fromString signature)
 
+  putStrLn $ "DBG: " <> toString (encode body)
+
   request' <- parseRequest $ "POST " <> _authenticatedBaseUrl client <> apipath
   let request = setRequestHeader "Content-Type" [ "application/json" ]
               $ setRequestHeader "bfx-nonce" [ pack nonce ]
               $ setRequestHeader "bfx-apikey" [ apikey ]
               $ setRequestHeader "bfx-signature" [ pack signed ]
-              $ setRequestBodyJSON body
+              $ setRequestBodyLBS (encode body)
               -- setRequestBodyJSON (AffiliateJSON $ AffCode affiliate)
                 request'
 
