@@ -15,4 +15,4 @@ newtype CancelOrderID = CancelOrderID { id :: Int } deriving (Eq, Show, Generic)
 instance ToJSON CancelOrderID
 
 cancelOrder :: BitfinexClient -> Int -> IO CancelOrderResponseRaw
-cancelOrder client orderID = queryBitfinexAuthenticatedWithBody client (CancelOrderID orderID) "w/order/cancel"
+cancelOrder client orderID = queryBitfinexAuthenticatedWithBody client (Just $ CancelOrderID orderID) "w/order/cancel"
