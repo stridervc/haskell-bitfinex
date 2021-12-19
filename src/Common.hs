@@ -10,6 +10,7 @@ module Common
   , queryBitfinexPublic
   , queryBitfinexAuthenticatedWithBody
   , queryBitfinexAuthenticated
+  , stringify
   ) where
 
 import Data.Time
