@@ -22,7 +22,7 @@ import Data.ByteString.Char8 (pack)
 import Data.ByteString.Lazy (fromStrict)
 import Data.Digest.Pure.SHA (hmacSha384)
 import Data.Time.Clock.POSIX (getPOSIXTime, utcTimeToPOSIXSeconds)
-import Data.ByteString.Lazy.UTF8 (fromString)
+import Data.ByteString.Lazy.UTF8 (fromString, toString)
 
 type Price      = Float
 type Percentage = Float
@@ -55,12 +55,12 @@ instance ToJSON AffCode
 newtype AffiliateJSON = AffiliateJSON { meta :: AffCode } deriving (Generic)
 instance ToJSON AffiliateJSON
 
-queryBitfinexAuthenticatedWithBody :: (FromJSON a, ToJSON b, Show b) => BitfinexClient -> b -> String -> IO a
+queryBitfinexAuthenticatedWithBody :: (FromJSON a, ToJSON b) => BitfinexClient -> b -> String -> IO a
 queryBitfinexAuthenticatedWithBody client body endpoint = do
   now <- getCurrentTime
   let nonce     = show $ floor $ 1e6 * nominalDiffTimeToSeconds (utcTimeToPOSIXSeconds now)
   let apipath   = "/v2/auth/" <> endpoint
-  let signature = "/api" <> apipath <> nonce <> show body
+  let signature = "/api" <> apipath <> nonce <> toString (encode body)
   let signed    = show $ hmacSha384 (fromStrict apisecret) (fromString signature)
 
   request' <- parseRequest $ "POST " <> _authenticatedBaseUrl client <> apipath
