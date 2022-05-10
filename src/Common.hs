@@ -12,6 +12,8 @@ module Common
   , queryBitfinexAuthenticated
   , ParamType (..)
   , stringify
+  , OrderType (..)
+  , orderTypeFromString
   ) where
 
 import Data.Time
@@ -28,6 +30,10 @@ import qualified Data.ByteString.Char8 as C8
 
 type Price      = Float
 type Percentage = Float
+data OrderType  = MarginLimit | ExchangeLimit | MarginMarket | ExchangeMarket | MarginStop | ExchangeStop | MarginStopLimit
+                | ExchangeStopLimit | MarginTrailingStop | ExchangeTrailingStop | MarginFOK | ExchangeFOK | MarginIOC | ExchangeIOC
+                | UnknownOrderType
+                deriving (Eq, Show)
 
 data BitfinexClient = BitfinexClient
   { _publicBaseUrl        :: String
@@ -90,3 +96,21 @@ queryBitfinexAuthenticatedWithBody client params endpoint = do
 
 queryBitfinexAuthenticated :: (FromJSON a) => BitfinexClient -> String -> IO a
 queryBitfinexAuthenticated client = queryBitfinexAuthenticatedWithBody client []
+
+orderTypeFromString :: String -> OrderType
+orderTypeFromString "LIMIT"   = MarginLimit
+orderTypeFromString "EXCHANGE LIMIT"          = ExchangeLimit
+orderTypeFromString "MARKET"                  = MarginMarket
+orderTypeFromString "EXCHANGE MARKET"         = ExchangeMarket
+orderTypeFromString "STOP"                    = MarginStop
+orderTypeFromString "EXCHANGE STOP"           = ExchangeStop
+orderTypeFromString "STOP LIMIT"              = MarginStopLimit
+orderTypeFromString "EXCHANGE STOP LIMIT"     = ExchangeStopLimit
+orderTypeFromString "TRAILING STOP"           = MarginTrailingStop
+orderTypeFromString "EXCHANGE TRAILING STOP"  = ExchangeTrailingStop
+orderTypeFromString "FOK"                     = MarginFOK
+orderTypeFromString "EXCHANGE FOK"            = ExchangeFOK
+orderTypeFromString "IOC"                     = MarginIOC
+orderTypeFromString "EXCHANGE IOC"            = ExchangeIOC
+orderTypeFromString _                         = UnknownOrderType
+
