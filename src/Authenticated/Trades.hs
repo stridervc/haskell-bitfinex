@@ -34,4 +34,4 @@ fromRaw (TradeRaw v) = Trade (d 0) (d 1) (d 2) (d 3) (d 4) (d 5) (d 6) (d 7) (d 
         d i = decode' $ v!!i
 
 trades :: BitfinexClient -> String -> IO [Trade]
-trades client symbol = map fromRaw <$> queryBitfinexAuthenticated client ("r/wallets/" ++ symbol ++ "/hist")
+trades client symbol = map fromRaw <$> queryBitfinexAuthenticated client ("r/trades/" ++ symbol ++ "/hist")
