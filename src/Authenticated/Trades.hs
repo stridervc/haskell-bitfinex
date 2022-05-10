@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# Language OverloadedStrings #-}
 
 module Authenticated.Trades
   ( Trade (..)
@@ -38,4 +39,6 @@ fromRaw (TradeRaw v) = Trade (d 0) (d 1) ctime (d 3) (d 4) (d 5) (d 6) (d 7) mak
         maker     = (d 8 :: Int) == 1
 
 trades :: BitfinexClient -> String -> IO [Trade]
-trades client symbol = map fromRaw <$> queryBitfinexAuthenticated client ("r/trades/" ++ symbol ++ "/hist")
+trades client symbol = map fromRaw <$> queryBitfinexAuthenticatedWithBody client
+  [ ("limit", ParamInt 100) ]
+  ("r/trades/" ++ symbol ++ "/hist")
