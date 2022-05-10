@@ -30,6 +30,7 @@ library
       Authenticated.RetrieveOrders
       Authenticated.RetrievePositions
       Authenticated.SubmitOrder
+      Authenticated.Trades
       Authenticated.Wallets
       Bitfinex
       Common
