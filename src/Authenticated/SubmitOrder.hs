@@ -14,11 +14,11 @@ import Data.ByteString.Lazy.Char8 (unpack)
 newtype ResponseRaw = ResponseRaw [Value] deriving (Eq, Show, Generic)
 instance FromJSON ResponseRaw
 
-type OrderType  = String
-type Symbol     = String
-type Amount     = Float
+type OrderTypeStr = String
+type Symbol       = String
+type Amount       = Float
 
-submitOrder :: BitfinexClient -> OrderType -> Symbol -> Amount -> Price -> IO ResponseRaw
+submitOrder :: BitfinexClient -> OrderTypeStr -> Symbol -> Amount -> Price -> IO ResponseRaw
 submitOrder client ordertype symbol amount price = queryBitfinexAuthenticatedWithBody client
   [ ("type",    ParamString ordertype)
   , ("symbol",  ParamString symbol)
