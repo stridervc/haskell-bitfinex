@@ -1,4 +1,6 @@
+.direnv/
+dist-newstyle/
+result
 .stack-work/
 *~
-*.lock
 *.swp
