@@ -1,4 +1,3 @@
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Common
@@ -22,9 +21,9 @@ import GHC.Generics
 import Network.HTTP.Simple
 import Data.Maybe (fromJust)
 import Data.Digest.Pure.SHA (hmacSha384)
-import Data.ByteString.Lazy.UTF8 (fromString)
-import Data.ByteString.Lazy (ByteString, toStrict)
-import Data.ByteString.Lazy.Char8 (pack, unpack, intercalate)
+import Data.ByteString.UTF8 (fromString)
+import Data.ByteString (ByteString, fromStrict, toStrict)
+import Data.ByteString.Char8 (pack, unpack, intercalate)
 import Data.Time.Clock.POSIX (getPOSIXTime, utcTimeToPOSIXSeconds)
 import qualified Data.ByteString.Char8 as C8
 
@@ -68,9 +67,9 @@ stringify :: Params -> ByteString
 stringify []      = ""
 stringify params  = "{" <> keyvalues <> "}"
   where keyvalues = intercalate "," $ map (\(k,v) -> "\"" <> k <> "\":" <> encode' v) params
-        encode' (ParamString s) = encode s
-        encode' (ParamFloat f)  = encode $ show f
-        encode' (ParamInt i)    = encode i
+        encode' (ParamString s) = toStrict $ encode s
+        encode' (ParamFloat f)  = toStrict $ encode $ show f
+        encode' (ParamInt i)    = toStrict $ encode i
         encode' (ParamRaw r)    = r
 
 queryBitfinexAuthenticatedWithBody :: FromJSON a => BitfinexClient -> Params -> String -> IO a
@@ -79,14 +78,14 @@ queryBitfinexAuthenticatedWithBody client params endpoint = do
   let nonce     = show $ floor $ 1e6 * nominalDiffTimeToSeconds (utcTimeToPOSIXSeconds now)
   let apipath   = "/v2/auth/" <> endpoint
   let signature = "/api" <> apipath <> nonce <> unpack (stringify params)
-  let signed    = show $ hmacSha384 apisecret (fromString signature)
+  let signed    = show $ hmacSha384 (fromStrict apisecret) (fromStrict $ fromString signature)
 
   request' <- parseRequest $ "POST " <> _authenticatedBaseUrl client <> apipath
   let request = setRequestHeader "Content-Type" [ "application/json" ]
               $ setRequestHeader "bfx-nonce" [ C8.pack nonce ]
-              $ setRequestHeader "bfx-apikey" [ toStrict apikey ]
+              $ setRequestHeader "bfx-apikey" [ apikey ]
               $ setRequestHeader "bfx-signature" [ C8.pack signed ]
-              $ setRequestBodyLBS (stringify params)
+              $ setRequestBodyLBS (fromStrict $ stringify params)
                 request'
 
   return <$> getResponseBody =<< httpJSON request

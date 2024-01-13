@@ -30,8 +30,6 @@ library
       Public.Ticker
   other-modules:
       Paths_haskell_bitfinex
-  hs-source-dirs:
-      src
   build-depends:
       SHA
     , aeson

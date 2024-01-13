@@ -8,8 +8,8 @@ module Authenticated.SubmitOrder
 import Common
 import Data.Aeson
 import GHC.Generics
-import Data.ByteString.Lazy (ByteString)
-import Data.ByteString.Lazy.Char8 (unpack)
+import Data.ByteString (ByteString)
+import Data.ByteString.Char8 (unpack)
 
 newtype ResponseRaw = ResponseRaw [Value] deriving (Eq, Show, Generic)
 instance FromJSON ResponseRaw
